@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>VvV | پیام‌رسان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#111a2e;--panel2:#17233b;--line:#26344f;--text:#edf2ff;--muted:#93a4c2;--accent:#7c5cff;--accent2:#5b8cff;--danger:#ff6b81}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 15% 0%,#1b2450 0,transparent 42%),var(--bg);color:var(--text);font-family:Vazirmatn,Tahoma,sans-serif;min-height:100vh}
+    button,input{font:inherit} button{cursor:pointer;border:0}
+    .hidden{display:none!important}.app{min-height:100vh;display:grid;place-items:center;padding:20px}
+    .auth{width:min(430px,100%);background:#111a2eee;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 25px 80px #0008}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;font-size:17px;letter-spacing:-1px;box-shadow:0 8px 25px #765cff55}
+    h1,h2,p{margin-top:0}.brand h1{font-size:25px;margin:0}.brand p{color:var(--muted);font-size:12px;margin:3px 0 0}
+    .tabs{display:flex;background:#0b1325;padding:4px;border-radius:12px;margin:22px 0}.tabs button{flex:1;padding:10px;background:transparent;color:var(--muted);border-radius:9px}.tabs button.active{background:var(--panel2);color:var(--text)}
+    label{display:block;color:#c8d3e8;font-size:13px;margin:14px 0 7px}input{width:100%;border:1px solid var(--line);background:#0b1325;color:var(--text);border-radius:11px;padding:12px 13px;outline:none}input:focus{border-color:var(--accent)}
+    .primary{width:100%;padding:12px;border-radius:11px;background:linear-gradient(110deg,var(--accent),var(--accent2));color:white;font-weight:700;margin-top:20px}.muted{color:var(--muted);font-size:12px;line-height:1.8}.status{min-height:22px;color:#ffb4bf;font-size:12px;margin-top:12px}
+    .shell{width:min(1120px,100%);height:min(760px,calc(100vh - 40px));min-height:560px;display:grid;grid-template-columns:310px 1fr;background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 25px 80px #0008}
+    .side{border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}.sidehead{padding:20px;border-bottom:1px solid var(--line)}.sidehead .brand{margin:0}.me{font-size:12px;color:var(--muted);margin-top:13px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .logout{background:#26334c;color:#dce5f8;padding:6px 10px;border-radius:8px;font-size:11px}.search{padding:13px 15px}.search input{padding:10px}
+    .users{overflow:auto;padding:0 9px 12px}.user{width:100%;display:flex;align-items:center;gap:11px;text-align:right;background:transparent;color:var(--text);padding:12px;border-radius:12px}.user:hover,.user.selected{background:var(--panel2)}.avatar{width:39px;height:39px;flex:none;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6555d9,#2e9cc8);font-weight:700}.uname{font-size:13px;font-weight:600}.uemail{font-size:10px;color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis}
+    .chat{display:flex;flex-direction:column;min-width:0}.chathead{padding:17px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}.chathead h2{font-size:15px;margin:0}.chathead p{font-size:11px;color:var(--muted);margin:3px 0 0}.messages{flex:1;overflow:auto;padding:22px;display:flex;flex-direction:column;gap:10px;background:radial-gradient(ellipse at 50% 100%,#17213b55,transparent 55%)}
+    .empty{margin:auto;text-align:center;color:var(--muted);font-size:13px;line-height:2}.bubble{max-width:min(72%,520px);padding:10px 13px;border-radius:15px;background:#202d48;align-self:flex-start;overflow-wrap:anywhere;font-size:13px;line-height:1.8}.bubble.mine{align-self:flex-end;background:linear-gradient(135deg,#5947bd,#425fc0);border-bottom-left-radius:4px}.bubble:not(.mine){border-bottom-right-radius:4px}.time{display:block;font-size:9px;opacity:.65;margin-top:3px}
+    .composer{display:flex;gap:10px;padding:15px 18px;border-top:1px solid var(--line)}.composer input{flex:1}.send{background:var(--accent);color:white;border-radius:11px;padding:0 22px;font-weight:700}.send:disabled{opacity:.4;cursor:not-allowed}
+    @media(max-width:700px){.app{padding:0}.shell{height:100vh;min-height:0;border-radius:0;grid-template-columns:115px 1fr}.sidehead{padding:12px 8px}.sidehead .brand{justify-content:center}.sidehead .brand h1,.sidehead .brand p{display:none}.me{display:block;text-align:center;font-size:10px}.logout{margin-top:7px}.search{padding:8px}.search input{font-size:10px;padding:8px 5px}.user{padding:9px 4px;justify-content:center}.user .avatar{width:34px;height:34px}.user .usertext{display:none}.chathead{padding:13px}.messages{padding:13px}.bubble{max-width:88%}.composer{padding:10px}.send{padding:0 14px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <section class="auth" id="authView">
+    <div class="brand"><div class="logo">VvV</div><div><h1>VvV</h1><p>پیام‌رسان کوچک و خصوصی شما</p></div></div>
+    <div class="tabs"><button id="loginTab" class="active" type="button">ورود</button><button id="signupTab" type="button">ثبت‌نام</button></div>
+    <form id="authForm">
+      <label for="username">نام کاربری</label><input id="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_.-]+" autocomplete="username" placeholder="مثلاً ali_123">
+      <label for="password">رمز عبور</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="حداقل ۶ کاراکتر">
+      <button class="primary" id="authSubmit" type="submit">ورود به VvV</button>
+      <div class="status" id="authStatus" role="status"></div>
+    </form>
+    <p class="muted">ورود فقط با نام کاربری و رمز عبور انجام می‌شود؛ ایمیل لازم نیست. برای استفاده چندنفره، مدیر سایت باید یک‌بار تنظیمات سرور را انجام دهد.</p>
+  </section>
+
+  <section class="shell hidden" id="chatView">
+    <aside class="side">
+      <div class="sidehead">
+        <div class="brand"><div class="logo">VvV</div><div><h1>VvV</h1><p>پیام‌رسان</p></div></div>
+        <div class="me"><span id="myName"></span><button class="logout" id="logoutBtn">خروج</button></div>
+      </div>
+      <div class="search"><input id="userSearch" placeholder="جستجوی افراد..." aria-label="جستجوی افراد"></div>
+      <div class="users" id="usersList"></div>
+    </aside>
+    <main class="chat">
+      <header class="chathead" id="chatHeader"><div class="empty">یک نفر را از فهرست انتخاب کن</div></header>
+      <div class="messages" id="messages"><div class="empty">برای شروع گفتگو، یکی از کاربران را انتخاب کن.</div></div>
+      <form class="composer" id="messageForm"><input id="messageInput" maxlength="2000" placeholder="اول یک گفتگو انتخاب کن..." disabled autocomplete="off"><button class="send" id="sendBtn" disabled>ارسال</button></form>
+    </main>
+  </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const configured = window.VVV_SUPABASE_URL && window.VVV_SUPABASE_ANON_KEY &&
+    !window.VVV_SUPABASE_URL.includes("YOUR_") && !window.VVV_SUPABASE_ANON_KEY.includes("YOUR_");
+  let supabase = null, currentUser = null, selectedUser = null, profiles = [], channel = null, mode = "login";
+  const authView=$("authView"), chatView=$("chatView");
+  function status(message){$("authStatus").textContent=message||""}
+  function setMode(next){
+    mode=next; $("loginTab").classList.toggle("active",mode==="login"); $("signupTab").classList.toggle("active",mode==="signup");
+    $("nameWrap").classList.toggle("hidden",mode!=="signup"); $("authSubmit").textContent=mode==="login"?"ورود به VvV":"ساخت حساب";
+    $("password").autocomplete=mode==="login"?"current-password":"new-password"; status("");
+  }
+  $("loginTab").onclick=()=>setMode("login"); $("signupTab").onclick=()=>setMode("signup");
+  function showAuth(){authView.classList.remove("hidden");chatView.classList.add("hidden")}
+  function showChat(){authView.classList.add("hidden");chatView.classList.remove("hidden")}
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  function displayName(p){return p.username||p.display_name||"کاربر"}
+  $("authForm").addEventListener("submit",async e=>{
+    e.preventDefault(); if(!supabase){status("ابتدا آدرس و کلید Supabase را در فایل config.js وارد کن.");return}
+    const username=$("username").value.trim().toLowerCase(), password=$("password").value;
+    if(!/^[a-z0-9_.-]{3,24}$/.test(username)){status("نام کاربری باید ۳ تا ۲۴ کاراکتر و فقط شامل حروف انگلیسی، عدد، نقطه، خط تیره یا زیرخط باشد.");return}
+    // Supabase Auth در حالت عادی شناسه ایمیل می‌خواهد؛ این ایمیل داخلی و ساختگی است
+    // و کاربر نه آن را وارد می‌کند و نه به آن نیاز دارد. تأیید ایمیل باید در Supabase خاموش باشد.
+    const authEmail=username+"@users.vvv.invalid";
+    $("authSubmit").disabled=true;status("لطفاً صبر کن...");
+    try{
+      if(mode==="signup"){
+        const {data,error}=await supabase.auth.signUp({email:authEmail,password,options:{data:{username,display_name:username}}});
+        if(error) throw error;
+        if(!data.session){status("ثبت‌نام انجام شد اما ورود خودکار فعال نشد. در تنظیمات Supabase تأیید ایمیل را خاموش کن و دوباره امتحان کن.");return}
+      }else{
+        const {error}=await supabase.auth.signInWithPassword({email:authEmail,password}); if(error) throw error;
+      }
+      await boot();
+    }catch(err){status(err.message||"خطا در ورود یا ثبت‌نام")}
+    finally{$("authSubmit").disabled=false}
+  });
+  async function boot(){
+    const {data:{user}}=await supabase.auth.getUser(); if(!user){showAuth();return}
+    currentUser=user; showChat();
+    $("myName").textContent= user.user_metadata?.username || user.user_metadata?.display_name || "کاربر";
+    await loadProfiles(); subscribeRealtime();
+  }
+  async function loadProfiles(){
+    const {data,error}=await supabase.from("profiles").select("id,username,display_name").neq("id",currentUser.id).order("username");
+    if(error){$("usersList").innerHTML='<p class="muted">خطا در دریافت کاربران. تنظیمات دیتابیس را بررسی کن.</p>';return}
+    profiles=data||[]; renderUsers();
+  }
+  function renderUsers(){
+    const q=$("userSearch").value.trim().toLowerCase();
+    const filtered=profiles.filter(p=>displayName(p).toLowerCase().includes(q));
+    $("usersList").innerHTML=filtered.length?filtered.map(p=>`<button class="user ${selectedUser?.id===p.id?"selected":""}" data-id="${p.id}"><span class="avatar">${escapeHtml(displayName(p).slice(0,1).toUpperCase())}</span><span class="usertext"><span class="uname">${escapeHtml(displayName(p))}</span><br><span class="uemail">@${escapeHtml(displayName(p))}</span></span></button>`).join(""):'<p class="muted" style="padding:10px">هنوز کاربر دیگری ثبت‌نام نکرده است.</p>';
+    $("usersList").querySelectorAll(".user").forEach(b=>b.onclick=()=>selectUser(profiles.find(p=>p.id===b.dataset.id)));
+  }
+  $("userSearch").addEventListener("input",renderUsers);
+  async function selectUser(p){
+    selectedUser=p; renderUsers(); $("chatHeader").innerHTML=`<span class="avatar">${escapeHtml(displayName(p).slice(0,1).toUpperCase())}</span><div><h2>${escapeHtml(displayName(p))}</h2><p>گفتگوی خصوصی در VvV</p></div>`;
+    $("messageInput").disabled=false;$("sendBtn").disabled=false;$("messageInput").placeholder="پیامت را بنویس...";
+    await loadMessages();
+  }
+  function pairFilter(){
+    return `and(sender_id.eq.${currentUser.id},recipient_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},recipient_id.eq.${currentUser.id})`;
+  }
+  async function loadMessages(){
+    if(!selectedUser)return;
+    const {data,error}=await supabase.from("messages").select("id,sender_id,recipient_id,body,created_at").or(pairFilter()).order("created_at",{ascending:true}).limit(500);
+    if(error){$("messages").innerHTML='<div class="empty">خطا در بارگذاری پیام‌ها.</div>';return}
+    renderMessages(data||[]);
+  }
+  function renderMessages(rows){
+    const box=$("messages");
+    if(!rows.length){box.innerHTML='<div class="empty">هنوز پیامی ردوبدل نشده؛ اولین پیام را بفرست!</div>';return}
+    box.innerHTML=rows.map(m=>`<div class="bubble ${m.sender_id===currentUser.id?"mine":""}">${escapeHtml(m.body).replace(/\n/g,"<br>")}<span class="time">${new Date(m.created_at).toLocaleString("fa-IR",{hour:"2-digit",minute:"2-digit",month:"short",day:"numeric"})}</span></div>`).join("");
+    box.scrollTop=box.scrollHeight;
+  }
+  $("messageForm").addEventListener("submit",async e=>{
+    e.preventDefault();const body=$("messageInput").value.trim();if(!body||!selectedUser)return;
+    $("sendBtn").disabled=true;
+    const {error}=await supabase.from("messages").insert({sender_id:currentUser.id,recipient_id:selectedUser.id,body});
+    if(error)alert("پیام ارسال نشد: "+error.message);else $("messageInput").value="";
+    $("sendBtn").disabled=false;$("messageInput").focus();await loadMessages();
+  });
+  function subscribeRealtime(){
+    if(channel)supabase.removeChannel(channel);
+    channel=supabase.channel("vvv-live-"+currentUser.id)
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+        const m=payload.new;
+        if(selectedUser && ((m.sender_id===currentUser.id&&m.recipient_id===selectedUser.id)||(m.sender_id===selectedUser.id&&m.recipient_id===currentUser.id)))loadMessages();
+      })
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"profiles"},()=>loadProfiles())
+      .subscribe();
+  }
+  $("logoutBtn").onclick=async()=>{if(channel)await supabase.removeChannel(channel);await supabase.auth.signOut();currentUser=null;selectedUser=null;showAuth()};
+  if(configured && window.supabase) supabase=window.supabase.createClient(window.VVV_SUPABASE_URL,window.VVV_SUPABASE_ANON_KEY);
+  else status("برای راه‌اندازی، فایل config.js را با اطلاعات پروژه Supabase تکمیل کن.");
+  if(supabase){
+    supabase.auth.getSession().then(({data})=>{if(data.session)boot()});
+    supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"&&session)boot();});
+  }
+})();
+</script>
+</body>
+</html>

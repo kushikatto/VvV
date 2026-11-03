@@ -51,7 +51,7 @@
         <div class="brand"><div class="logo">VvV</div><div><h1>VvV</h1><p>پیام‌رسان</p></div></div>
         <div class="me"><span id="myName"></span><span class="sideactions"><button class="settingsBtn" id="settingsBtn">تنظیمات</button><button class="logout" id="logoutBtn">خروج</button></span></div>
       </div>
-      <div class="search"><input id="userSearch" placeholder="جستجوی افراد..." aria-label="جستجوی افراد"></div>
+      <div class="search"><input id="userSearch" type="search" autocomplete="off" placeholder="جستجوی نام کاربری یا نام نمایشی..." aria-label="جستجوی کاربران"></div>
       <div class="featurebox"><strong>سرورهای VvV</strong><small>ساخت سرور شخصی در نسخه‌های آینده فعال می‌شود.</small><button type="button" disabled>＋ ساخت سرور (به‌زودی)</button></div>
       <div class="users" id="usersList"></div>
     </aside>
@@ -88,7 +88,7 @@ $("authSubmit").textContent=mode==="login"?"ورود به VvV":"ساخت حسا�
   function showAuth(){authView.classList.remove("hidden");chatView.classList.add("hidden")}
   function showChat(){authView.classList.add("hidden");chatView.classList.remove("hidden")}
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-  function displayName(p){return p.username||p.display_name||"کاربر"}
+  function displayName(p){return p.display_name||p.username||"کاربر"}
   $("authForm").addEventListener("submit",async e=>{
     e.preventDefault(); if(!supabase){status("ابتدا آدرس و کلید Supabase را در فایل config.js وارد کن.");return}
     const username=$("username").value.trim().toLowerCase(), password=$("password").value;
@@ -129,9 +129,17 @@ $("authSubmit").textContent=mode==="login"?"ورود به VvV":"ساخت حسا�
   }
   function renderUsers(){
     const q=$("userSearch").value.trim().toLowerCase();
-    let filtered=profiles;
+    const filtered=isAdmin && q ? profiles.filter(p=>
+      String(p.username||"").toLowerCase().includes(q) ||
+      String(p.display_name||"").toLowerCase().includes(q)
+    ) : profiles;
     const suggestionButton=isAdmin?`<button class="user ${viewingSuggestions?"selected":""}" id="suggestionsInbox"><span class="avatar">✉</span><span class="usertext"><span class="uname">پیشنهاد ها</span><br><span class="uemail">صندوق پیشنهادهای کاربران</span></span></button>`:"";
-    $("usersList").innerHTML=suggestionButton+(filtered.length?filtered.map(p=>`<button class="user ${!viewingSuggestions&&selectedUser?.id===p.id?"selected":""}" data-id="${p.id}"><span class="avatar">${escapeHtml(displayName(p).slice(0,1).toUpperCase())}</span><span class="usertext"><span class="uname">${escapeHtml(displayName(p))}</span><br><span class="uemail">@${escapeHtml(displayName(p))}</span><div class="steamline" id="steam-${p.id}">${p.steam_id?"Steam: در حال بررسی…":"Steam متصل نیست"}</div></span></button>`).join(""):(isAdmin?'<p class="muted" style="padding:10px">کاربری پیدا نشد.</p>':(q.length<2?'<p class="muted" style="padding:10px">برای حفظ حریم خصوصی، فهرست کاربران نمایش داده نمی‌شود. برای پیدا کردن افراد، حداقل دو حرف از نام کاربری را جستجو کن.</p>':'<p class="muted" style="padding:10px">در حال جستجو...</p>')));
+    const emptyMessage=isAdmin
+      ? '<p class="muted" style="padding:10px">کاربری با این مشخصات پیدا نشد.</p>'
+      : (q.length<2
+        ? '<p class="muted" style="padding:10px">برای حفظ حریم خصوصی، فهرست کاربران نمایش داده نمی‌شود. حداقل دو حرف از نام کاربری یا نام نمایشی را جستجو کن.</p>'
+        : '<p class="muted" style="padding:10px">نتیجه‌ای پیدا نشد. املای نام را بررسی کن یا بخش دیگری از نام را جستجو کن.</p>');
+    $("usersList").innerHTML=suggestionButton+(filtered.length?filtered.map(p=>`<button class="user ${!viewingSuggestions&&selectedUser?.id===p.id?"selected":""}" data-id="${p.id}"><span class="avatar">${escapeHtml(displayName(p).slice(0,1).toUpperCase())}</span><span class="usertext"><span class="uname">${escapeHtml(displayName(p))}</span><br><span class="uemail">@${escapeHtml(p.username||"")}</span><div class="steamline" id="steam-${p.id}">${p.steam_id?"Steam: در حال بررسی…":"Steam متصل نیست"}</div></span></button>`).join(""):emptyMessage);
     $("suggestionsInbox")?.addEventListener("click",openSuggestionsInbox);
     $("usersList").querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>selectUser(profiles.find(p=>p.id===b.dataset.id)));
   }
@@ -183,11 +191,24 @@ $("authSubmit").textContent=mode==="login"?"ورود به VvV":"ساخت حسا�
   }
   $("userSearch").addEventListener("input",()=>{
     const q=$("userSearch").value.trim();
-    if(isAdmin){renderUsers();return;}
     clearTimeout(searchTimer);
+    if(isAdmin){renderUsers();return;}
     if(q.length<2){profiles=[];renderUsers();return;}
-    $("usersList").innerHTML='<p class="muted" style="padding:10px">در حال جستجو...</p>';
-    searchTimer=setTimeout(async()=>{const {data,error}=await supabase.rpc("search_vvv_users",{search_text:q});profiles=error?[]:(data||[]);renderUsers();refreshSteamStatuses();},300);
+    $("usersList").innerHTML='<p class="muted" style="padding:10px">در حال جستجوی کاربران...</p>';
+    searchTimer=setTimeout(async()=>{
+      const {data,error}=await supabase.rpc("search_vvv_users",{search_text:q});
+      if(error){
+        console.error("User search failed:",error);
+        profiles=[];
+        $("usersList").innerHTML='<p class="muted" style="padding:10px">جستجو انجام نشد. احتمالاً تابع جستجو در Supabase به‌روزرسانی نشده است. فایل schema.sql جدید را در SQL Editor اجرا کن.</p>';
+        return;
+      }
+      // Ignore stale results if the user has typed a newer query.
+      if($("userSearch").value.trim()!==q)return;
+      profiles=data||[];
+      renderUsers();
+      refreshSteamStatuses();
+    },300);
   });
   async function selectUser(p){
     viewingSuggestions=false; selectedUser=p; renderUsers(); chatView.classList.add("mobile-chat"); $("chatHeader").innerHTML=`<button class="backBtn" id="backToUsers">بازگشت</button><span class="avatar">${escapeHtml(displayName(p).slice(0,1).toUpperCase())}</span><div><h2>${escapeHtml(displayName(p))}</h2><p>گفتگوی خصوصی در VvV</p></div>`;

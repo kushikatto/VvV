@@ -109,7 +109,10 @@ language sql stable security definer set search_path = '' as $$
   where auth.uid() is not null
     and p.id <> auth.uid()
     and length(trim(coalesce(search_text,''))) >= 2
-    and p.username ilike '%' || trim(search_text) || '%'
+    and (
+      p.username ilike '%' || trim(search_text) || '%'
+      or p.display_name ilike '%' || trim(search_text) || '%'
+    )
   order by p.username limit 30;
 $$;
 revoke all on function public.search_vvv_users(text) from public;
